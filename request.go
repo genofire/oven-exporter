@@ -2,16 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
-	"fmt"
 )
 
 func (c *configData) Request(url string, value interface{}) error {
 	netClient := &http.Client{
 		Timeout: time.Second * 20,
 	}
-	req, err := http.NewRequest(http.MethodGet, c.Host + url, nil)
+	req, err := http.NewRequest(http.MethodGet, c.Host+url, nil)
 	if err != nil {
 		return err
 	}
@@ -30,4 +30,3 @@ func (c *configData) Request(url string, value interface{}) error {
 	}
 	return nil
 }
-

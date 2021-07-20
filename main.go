@@ -1,8 +1,8 @@
 package main
 
 import (
-	"flag"
 	"encoding/base64"
+	"flag"
 
 	"dev.sum7.eu/genofire/golang-lib/file"
 	"github.com/bdlm/log"
