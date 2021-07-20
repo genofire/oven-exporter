@@ -1,3 +1,6 @@
+listen = ":8080"
+
+[api]
 host = "http://1.2.3.4:8081"
 token = "ome-access-token"
 
