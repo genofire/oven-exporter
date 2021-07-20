@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"fmt"
@@ -16,7 +16,7 @@ type ResponseList struct {
 	Data       []string `json:"response,omitempty"`
 }
 
-func (c *configData) RequestListVHosts() (*ResponseList, error) {
+func (c *Client) RequestListVHosts() (*ResponseList, error) {
 	req := ResponseList{}
 	url := fmt.Sprintf(URLRequestListVHost)
 	if err := c.Request(url, &req); err != nil {
@@ -25,7 +25,7 @@ func (c *configData) RequestListVHosts() (*ResponseList, error) {
 	return &req, nil
 }
 
-func (c *configData) RequestListApps(vhost string) (*ResponseList, error) {
+func (c *Client) RequestListApps(vhost string) (*ResponseList, error) {
 	req := ResponseList{}
 	url := fmt.Sprintf(URLRequestListApp, vhost)
 	if err := c.Request(url, &req); err != nil {
@@ -34,7 +34,7 @@ func (c *configData) RequestListApps(vhost string) (*ResponseList, error) {
 	return &req, nil
 }
 
-func (c *configData) RequestListStreams(vhost, app string) (*ResponseList, error) {
+func (c *Client) RequestListStreams(vhost, app string) (*ResponseList, error) {
 	req := ResponseList{}
 	url := fmt.Sprintf(URLRequestListStream, vhost, app)
 	if err := c.Request(url, &req); err != nil {

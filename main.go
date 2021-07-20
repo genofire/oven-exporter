@@ -1,16 +1,16 @@
 package main
 
 import (
-	"encoding/base64"
 	"flag"
 
 	"dev.sum7.eu/genofire/golang-lib/file"
 	"github.com/bdlm/log"
+
+	"dev.sum7.eu/genofire/oven-exporter/api"
 )
 
 type configData struct {
-	Token string `toml:"token"`
-	Host  string `toml:"host"`
+	API *api.Client `toml:"api"`
 }
 
 func main() {
@@ -24,6 +24,6 @@ func main() {
 	if err := file.ReadTOML(configPath, config); err != nil {
 		log.Panicf("open config file: %s", err)
 	}
-	config.Token = base64.StdEncoding.EncodeToString([]byte(config.Token))
-	config.fetch()
+	config.API.SetToken(config.API.Token)
+	fetch(config.API)
 }

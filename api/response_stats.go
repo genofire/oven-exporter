@@ -1,9 +1,7 @@
-package main
+package api
 
 import (
 	"fmt"
-
-	"github.com/bdlm/log"
 )
 
 const (
@@ -33,17 +31,7 @@ type ResponseStatsData struct {
 	TotalBytesOut uint64 `json:"totalBytesOut" example:"117022184"`
 }
 
-func (resp *ResponseStats) Log(log *log.Entry) {
-	logger := log
-	if resp.Data != nil {
-		logger.WithFields(map[string]interface{}{
-			"max_clients": resp.Data.MaxTotalConnections,
-			"clients":     resp.Data.TotalConnections,
-		})
-	}
-	logger.Info(resp.Message)
-}
-func (c *configData) RequestStatsVHost(vhost string) (*ResponseStats, error) {
+func (c *Client) RequestStatsVHost(vhost string) (*ResponseStats, error) {
 	req := ResponseStats{}
 	url := fmt.Sprintf(URLRequestStatsVHost, vhost)
 	if err := c.Request(url, &req); err != nil {
@@ -52,7 +40,7 @@ func (c *configData) RequestStatsVHost(vhost string) (*ResponseStats, error) {
 	return &req, nil
 }
 
-func (c *configData) RequestStatsApp(vhost, app string) (*ResponseStats, error) {
+func (c *Client) RequestStatsApp(vhost, app string) (*ResponseStats, error) {
 	req := ResponseStats{}
 	url := fmt.Sprintf(URLRequestStatsApp, vhost, app)
 	if err := c.Request(url, &req); err != nil {
@@ -61,7 +49,7 @@ func (c *configData) RequestStatsApp(vhost, app string) (*ResponseStats, error) 
 	return &req, nil
 }
 
-func (c *configData) RequestStatsStream(vhost, app, stream string) (*ResponseStats, error) {
+func (c *Client) RequestStatsStream(vhost, app, stream string) (*ResponseStats, error) {
 	req := ResponseStats{}
 	url := fmt.Sprintf(URLRequestStatsStream, vhost, app, stream)
 	if err := c.Request(url, &req); err != nil {

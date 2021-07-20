@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-func (c *configData) Request(url string, value interface{}) error {
+// Request to API and unmarshal result
+func (c *Client) Request(url string, value interface{}) error {
 	netClient := &http.Client{
 		Timeout: time.Second * 20,
 	}
