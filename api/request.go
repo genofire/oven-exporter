@@ -12,7 +12,7 @@ func (c *Client) Request(url string, value interface{}) error {
 	netClient := &http.Client{
 		Timeout: time.Second * 20,
 	}
-	req, err := http.NewRequest(http.MethodGet, c.Host+url, nil)
+	req, err := http.NewRequest(http.MethodGet, c.URL+url, nil)
 	if err != nil {
 		return err
 	}

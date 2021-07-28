@@ -1,0 +1,12 @@
+[Unit]
+Description = Prometheus exporter for OvenMediaEngine
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/oven-exporter -c /etc/ovenmediaengine/exporter.conf
+Restart=always
+RestartSec=5s
+Environment=PATH=/usr/bin:/usr/local/bin
+
+[Install]
+WantedBy=multi-user.target

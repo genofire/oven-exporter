@@ -4,14 +4,16 @@ import "encoding/base64"
 
 // A Client for the API
 type Client struct {
-	Token string `toml:"token"`
-	Host  string `toml:"host"`
+	Token        string `toml:"token"`
+	URL          string `toml:"url"`
+	DefaultVHost string `toml:"default_vhost"`
+	DefaultApp   string `toml:"default_app"`
 }
 
 // New Client from host and token
-func New(host, token string) *Client {
+func New(url, token string) *Client {
 	c := &Client{
-		Host: host,
+		URL: url,
 	}
 	c.SetToken(token)
 	return c
