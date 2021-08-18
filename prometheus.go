@@ -39,6 +39,17 @@ var (
 		promDescStatsStreamBytesInTotal,
 		promDescStatsStreamBytesOutTotal,
 	}
+
+	promDescPushUp             = prometheus.NewDesc("oven_push_up", "state of push", []string{"vhost", "app", "stream", "id", "state"}, prometheus.Labels{})
+	promDescPushSequence       = prometheus.NewDesc("oven_push_sequence", "sequence of started pushes", []string{"vhost", "app", "stream", "id"}, prometheus.Labels{})
+	promDescPushSentBytes      = prometheus.NewDesc("oven_push_send_byte", "bytes send on push", []string{"vhost", "app", "stream", "id"}, prometheus.Labels{})
+	promDescPushTotalSentBytes = prometheus.NewDesc("oven_push_total_send_bytes", "total bytes send on push", []string{"vhost", "app", "stream", "id"}, prometheus.Labels{})
+	promDescPush               = []*prometheus.Desc{
+		promDescPushUp,
+		promDescPushSequence,
+		promDescPushSentBytes,
+		promDescPushTotalSentBytes,
+	}
 )
 
 func ResponseStatsToMetrics(resp *api.ResponseStats, descs []*prometheus.Desc, labels ...string) []prometheus.Metric {
@@ -49,13 +60,13 @@ func ResponseStatsToMetrics(resp *api.ResponseStats, descs []*prometheus.Desc, l
 	if m, err := prometheus.NewConstMetric(descs[0], prometheus.GaugeValue, float64(resp.Data.TotalConnections), labels...); err == nil {
 		list = append(list, m)
 	}
-	if m, err := prometheus.NewConstMetric(descs[1], prometheus.GaugeValue, float64(resp.Data.MaxTotalConnections), labels...); err == nil {
+	if m, err := prometheus.NewConstMetric(descs[1], prometheus.CounterValue, float64(resp.Data.MaxTotalConnections), labels...); err == nil {
 		list = append(list, m)
 	}
-	if m, err := prometheus.NewConstMetric(descs[2], prometheus.GaugeValue, float64(resp.Data.TotalBytesIn), labels...); err == nil {
+	if m, err := prometheus.NewConstMetric(descs[2], prometheus.CounterValue, float64(resp.Data.TotalBytesIn), labels...); err == nil {
 		list = append(list, m)
 	}
-	if m, err := prometheus.NewConstMetric(descs[3], prometheus.GaugeValue, float64(resp.Data.TotalBytesOut), labels...); err == nil {
+	if m, err := prometheus.NewConstMetric(descs[3], prometheus.CounterValue, float64(resp.Data.TotalBytesOut), labels...); err == nil {
 		list = append(list, m)
 	}
 	return list
@@ -69,6 +80,9 @@ func (c *configData) Describe(d chan<- *prometheus.Desc) {
 		d <- desc
 	}
 	for _, desc := range promDescStatsStream {
+		d <- desc
+	}
+	for _, desc := range promDescPush {
 		d <- desc
 	}
 }
@@ -95,6 +109,25 @@ func (c *configData) Collect(metrics chan<- prometheus.Metric) {
 			if resp, err := c.API.RequestStatsApp(vhost, app); err == nil {
 				for _, m := range ResponseStatsToMetrics(resp, promDescStatsApp, vhost, app) {
 					metrics <- m
+				}
+			}
+			if resp, err := c.API.RequestPushStatus(vhost, app); err != nil {
+				logApp.Errorf("unable to fetch pushes %s", err)
+			} else {
+				for _, data := range resp.Data {
+					if m, err := prometheus.NewConstMetric(promDescPushUp, prometheus.GaugeValue, 1, vhost, app, data.Stream.Name, data.ID, data.State); err == nil {
+						metrics <- m
+					}
+					labels := []string{vhost, app, data.Stream.Name, data.ID}
+					if m, err := prometheus.NewConstMetric(promDescPushSequence, prometheus.CounterValue, float64(data.Sequence), labels...); err == nil {
+						metrics <- m
+					}
+					if m, err := prometheus.NewConstMetric(promDescPushSentBytes, prometheus.GaugeValue, float64(data.SentBytes), labels...); err == nil {
+						metrics <- m
+					}
+					if m, err := prometheus.NewConstMetric(promDescPushTotalSentBytes, prometheus.CounterValue, float64(data.TotalSentBytes), labels...); err == nil {
+						metrics <- m
+					}
 				}
 			}
 			respList, err = c.API.RequestListStreams(vhost, app)
