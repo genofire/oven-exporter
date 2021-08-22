@@ -8,6 +8,7 @@ import (
 // API URLS for Push
 const (
 	URLRequestPushStatus = "/v1/vhosts/%s/apps/%s:pushes"
+	URLRequestPushStart  = "/v1/vhosts/%s/apps/%s:startPush"
 	URLRequestPushStop   = "/v1/vhosts/%s/apps/%s:stopPush"
 )
 
@@ -41,6 +42,15 @@ type ResponsePushData struct {
 	TotalSentTime  uint64 `json:"totalsentTime" example:"933808"`
 }
 
+// ResponsePushStart one push configuration
+type ResponsePushStart struct {
+	ID        string                  `json:"id" example:"youtube"`
+	Stream    *ResponsePushDataStream `json:"stream"`
+	Protocol  string                  `json:"protocol" example:"rtmp"`
+	URL       string                  `json:"url" example:"rtmp://a.rtmp.youtube.com/live2"`
+	StreamKey string                  `json:"streamKey" example:"SUPERSECRET"`
+}
+
 // ResponsePushDataStream of data of stream
 type ResponsePushDataStream struct {
 	Name   string `json:"name" example:"..."`
@@ -60,6 +70,21 @@ func (c *Client) RequestPushStatus(vhost, app string) (*ResponsePushStatus, erro
 // RequestPushStatusDefault to get list of pushes and his configuration for default vhost and app
 func (c *Client) RequestPushStatusDefault() (*ResponsePushStatus, error) {
 	return c.RequestPushStatus(c.DefaultVHost, c.DefaultApp)
+}
+
+// StartPush to delete an push
+func (c *Client) StartPush(vhost, app string, data *ResponsePushStart) (*ResponsePushStatus, error) {
+	req := ResponsePushStatus{}
+	url := fmt.Sprintf(URLRequestPushStart, vhost, app)
+	if err := c.Request(http.MethodPost, url, &data, &req); err != nil {
+		return &req, err
+	}
+	return &req, nil
+}
+
+// StartPushDefault to delete an push and on default vhost and app
+func (c *Client) StartPushDefault(data *ResponsePushStart) (*ResponsePushStatus, error) {
+	return c.StartPush(c.DefaultVHost, c.DefaultApp, data)
 }
 
 // DeletePush to delete an push
