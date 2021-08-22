@@ -2,11 +2,13 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 )
 
 // API URLS for Push
 const (
 	URLRequestPushStatus = "/v1/vhosts/%s/apps/%s:pushes"
+	URLRequestPushStop   = "/v1/vhosts/%s/apps/%s:stopPush"
 )
 
 // ResponsePushStatus JSON Message with Push status data
@@ -49,7 +51,7 @@ type ResponsePushDataStream struct {
 func (c *Client) RequestPushStatus(vhost, app string) (*ResponsePushStatus, error) {
 	req := ResponsePushStatus{}
 	url := fmt.Sprintf(URLRequestPushStatus, vhost, app)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil
@@ -58,4 +60,22 @@ func (c *Client) RequestPushStatus(vhost, app string) (*ResponsePushStatus, erro
 // RequestPushStatusDefault to get list of pushes and his configuration for default vhost and app
 func (c *Client) RequestPushStatusDefault() (*ResponsePushStatus, error) {
 	return c.RequestPushStatus(c.DefaultVHost, c.DefaultApp)
+}
+
+// DeletePush to delete an push
+func (c *Client) DeletePush(vhost, app, id string) error {
+	type idJSON struct {
+		ID string `json:"id"`
+	}
+	url := fmt.Sprintf(URLRequestPushStop, vhost, app)
+	data := idJSON{ID: id}
+	if err := c.Request(http.MethodPost, url, &data, nil); err != nil {
+		return err
+	}
+	return nil
+}
+
+// DeletePushDefault to delete an push and on default vhost and app
+func (c *Client) DeletePushDefault(id string) error {
+	return c.DeletePush(c.DefaultVHost, c.DefaultApp, id)
 }

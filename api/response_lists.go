@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 )
 
 const (
@@ -20,7 +21,7 @@ type ResponseList struct {
 func (c *Client) RequestListVHosts() (*ResponseList, error) {
 	req := ResponseList{}
 	url := fmt.Sprintf(URLRequestListVHost)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil
@@ -30,7 +31,7 @@ func (c *Client) RequestListVHosts() (*ResponseList, error) {
 func (c *Client) RequestListApps(vhost string) (*ResponseList, error) {
 	req := ResponseList{}
 	url := fmt.Sprintf(URLRequestListApp, vhost)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil
@@ -45,7 +46,7 @@ func (c *Client) RequestDefaultListApps() (*ResponseList, error) {
 func (c *Client) RequestListStreams(vhost, app string) (*ResponseList, error) {
 	req := ResponseList{}
 	url := fmt.Sprintf(URLRequestListStream, vhost, app)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil

@@ -1,18 +1,33 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
 // Request to API and unmarshal result
-func (c *Client) Request(url string, value interface{}) error {
+func (c *Client) Request(method, url string, body, value interface{}) error {
 	netClient := &http.Client{
 		Timeout: time.Second * 20,
 	}
-	req, err := http.NewRequest(http.MethodGet, c.URL+url, nil)
+	var jsonBody io.Reader
+	if body != nil {
+		if strBody, ok := body.(string); ok {
+			jsonBody = strings.NewReader(strBody)
+		} else {
+			jsonBodyArray, err := json.Marshal(body)
+			if err != nil {
+				return err
+			}
+			jsonBody = bytes.NewBuffer(jsonBodyArray)
+		}
+	}
+	req, err := http.NewRequest(method, c.URL+url, jsonBody)
 	if err != nil {
 		return err
 	}

@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 )
 
 const (
@@ -34,7 +35,7 @@ type ResponseStatsData struct {
 func (c *Client) RequestStatsVHost(vhost string) (*ResponseStats, error) {
 	req := ResponseStats{}
 	url := fmt.Sprintf(URLRequestStatsVHost, vhost)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil
@@ -43,7 +44,7 @@ func (c *Client) RequestStatsVHost(vhost string) (*ResponseStats, error) {
 func (c *Client) RequestStatsApp(vhost, app string) (*ResponseStats, error) {
 	req := ResponseStats{}
 	url := fmt.Sprintf(URLRequestStatsApp, vhost, app)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil
@@ -52,7 +53,7 @@ func (c *Client) RequestStatsApp(vhost, app string) (*ResponseStats, error) {
 func (c *Client) RequestStatsStream(vhost, app, stream string) (*ResponseStats, error) {
 	req := ResponseStats{}
 	url := fmt.Sprintf(URLRequestStatsStream, vhost, app, stream)
-	if err := c.Request(url, &req); err != nil {
+	if err := c.Request(http.MethodGet, url, nil, &req); err != nil {
 		return nil, err
 	}
 	return &req, nil
