@@ -2,8 +2,8 @@ package main
 
 import (
 	"dev.sum7.eu/genofire/oven-exporter/api"
-	"github.com/bdlm/log"
 	"github.com/prometheus/client_golang/prometheus"
+	"go.uber.org/zap"
 )
 
 var (
@@ -90,10 +90,10 @@ func (c *configData) Describe(d chan<- *prometheus.Desc) {
 func (c *configData) Collect(metrics chan<- prometheus.Metric) {
 	respList, err := c.API.RequestListVHosts()
 	if err != nil {
-		log.Panicf("unable to fetch vhosts: %s", err)
+		c.log.Panic("unable to fetch vhosts", zap.Error(err))
 	}
 	for _, vhost := range respList.Data {
-		logVhost := log.WithField("vhost", vhost)
+		logVhost := c.log.With(zap.String("vhost", vhost))
 		if resp, err := c.API.RequestStatsVHost(vhost); err == nil {
 			for _, m := range ResponseStatsToMetrics(resp, promDescStatsVHost, vhost) {
 				metrics <- m
@@ -101,18 +101,18 @@ func (c *configData) Collect(metrics chan<- prometheus.Metric) {
 		}
 		respList, err = c.API.RequestListApps(vhost)
 		if err != nil {
-			logVhost.Errorf("unable to fetch apps: %s", err)
+			logVhost.Error("unable to fetch apps", zap.Error(err))
 			continue
 		}
 		for _, app := range respList.Data {
-			logApp := logVhost.WithField("app", app)
+			logApp := logVhost.With(zap.String("app", app))
 			if resp, err := c.API.RequestStatsApp(vhost, app); err == nil {
 				for _, m := range ResponseStatsToMetrics(resp, promDescStatsApp, vhost, app) {
 					metrics <- m
 				}
 			}
 			if resp, err := c.API.RequestPushStatus(vhost, app); err != nil {
-				logApp.Errorf("unable to fetch pushes %s", err)
+				logApp.Error("unable to fetch pushes", zap.Error(err))
 			} else {
 				for _, data := range resp.Data {
 					if m, err := prometheus.NewConstMetric(promDescPushUp, prometheus.GaugeValue, 1, vhost, app, data.Stream.Name, data.ID, data.State); err == nil {
@@ -132,7 +132,7 @@ func (c *configData) Collect(metrics chan<- prometheus.Metric) {
 			}
 			respList, err = c.API.RequestListStreams(vhost, app)
 			if err != nil {
-				logApp.Errorf("unable to fetch stream: %s", err)
+				logApp.Error("unable to fetch stream", zap.Error(err))
 				continue
 			}
 			for _, stream := range respList.Data {
