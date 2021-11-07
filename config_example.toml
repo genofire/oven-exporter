@@ -1,6 +1,9 @@
+# (Address +) Port where the Exporter is listen for Prometheus request
 listen = ":8080"
 
 [api]
+# URL to REST-API of OvenMediaEngine 
 url = "http://1.2.3.4:8081"
+# AccessToken of OvenMediaEngine's REST-API
 token = "ome-access-token"
 
