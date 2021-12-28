@@ -22,7 +22,7 @@ type configData struct {
 func main() {
 	configPath := "config.toml"
 
-	log := zap.L()
+	log, _ := zap.NewProduction()
 
 	flag.StringVar(&configPath, "c", configPath, "path to configuration file")
 
