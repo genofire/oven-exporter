@@ -1,0 +1,58 @@
+image: "golang:latest"
+
+variables:
+  DOCKER_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  # Tell 'docker:dind' to enable TLS (recommended)
+  # and generate certificates in the specified directory.
+  DOCKER_TLS_CERTDIR: "/certs"
+
+stages:
+  - test
+  - build
+
+test-lint:
+  stage: test
+  script:
+    - go install github.com/client9/misspell/cmd/misspell@latest
+    - find . -type f -not -path "./webroot/assets" | grep -v "models/.*_testdata.*.go" | xargs misspell -error
+    - ./.ci/check-gofmt
+    - ./.ci/check-testfiles
+
+build-linux:
+  stage: build
+  except:
+    - tags
+    - master
+    - main
+  script:
+    # build app with version
+    - go install
+    - mv "/go/bin/$CI_PROJECT_NAME" "$CI_PROJECT_DIR/$CI_PROJECT_NAME"
+  artifacts:
+    paths:
+      - config_example.toml
+      - "$CI_PROJECT_NAME"
+
+build-docker:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE_TAG --build-arg VERSION=$CI_COMMIT_REF_SLUG .
+    - docker push $DOCKER_IMAGE_TAG
+
+build-release:
+  stage: build
+  only:
+    - tags
+  script:
+    # build app with version
+    - go install
+    - mv "/go/bin/$CI_PROJECT_NAME" "$CI_PROJECT_DIR/$CI_PROJECT_NAME"
+  artifacts:
+    paths:
+      - config_example.toml
+      - "$CI_PROJECT_NAME"
+    expire_in: never
