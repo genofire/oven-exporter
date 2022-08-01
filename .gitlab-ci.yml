@@ -1,7 +1,6 @@
 image: "golang:latest"
 
 variables:
-  DOCKER_IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   # Tell 'docker:dind' to enable TLS (recommended)
   # and generate certificates in the specified directory.
   DOCKER_TLS_CERTDIR: "/certs"
@@ -33,15 +32,38 @@ build-linux:
       - config_example.toml
       - "$CI_PROJECT_NAME"
 
-build-docker:
+build-docker-latest:
   stage: build
   image: docker:latest
   services:
     - docker:dind
+  only:
+    - main
+    - master
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker build -t $DOCKER_IMAGE_TAG --build-arg VERSION=$CI_COMMIT_REF_SLUG .
-    - docker push $DOCKER_IMAGE_TAG
+    - docker build --build-arg VERSION=$CI_COMMIT_TAG 
+      -t $CI_REGISTRY_IMAGE:latest 
+      .
+    - docker push $CI_REGISTRY_IMAGE:latest
+
+build-docker-release:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  only:
+    - tags
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build --build-arg VERSION=$CI_COMMIT_TAG 
+      -t $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG 
+      -t $CI_REGISTRY_IMAGE:${CI_COMMIT_TAG%\.[0-9]*} 
+      -t $CI_REGISTRY_IMAGE:${CI_COMMIT_TAG%\.[0-9]*\.[0-9]*} 
+      .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_TAG%\.[0-9]*}
+    - docker push $CI_REGISTRY_IMAGE:${CI_COMMIT_TAG%\.[0-9]*\.[0-9]*}
 
 build-release:
   stage: build
