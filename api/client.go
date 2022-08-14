@@ -4,10 +4,10 @@ import "encoding/base64"
 
 // A Client for the API
 type Client struct {
-	Token        string `toml:"token"`
-	URL          string `toml:"url"`
-	DefaultVHost string `toml:"default_vhost"`
-	DefaultApp   string `toml:"default_app"`
+	Token        string `config:"token"`
+	URL          string `config:"url"`
+	DefaultVHost string `config:"default_vhost"`
+	DefaultApp   string `config:"default_app"`
 }
 
 // New Client from host and token

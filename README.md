@@ -24,6 +24,17 @@ Read comments in [config_example.toml](config_example.toml) for more information
 
 Maybe a good place to store this file is: `/etc/ovenmediaengine/exporter.conf`
 
+OR use env variables:
+```
+OVEN_E_LISTEN=:8080
+OVEN_E_API__URL=http://1.2.3.4:8081
+OVEN_E_API__TOKEN=ome-access-token
+OVEN_E_API__DEFAULT_VHOST=
+OVEN_E_API__DEFAULT_APP=
+```
+
+(File read could be disabled by call `oven-exporter -c ''`
+
 ### Startup
 Create a systemd.service file e.g. under `/etc/systemd/system/oven-exporter.service` with maybe a content like this:
 
