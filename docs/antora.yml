@@ -2,7 +2,7 @@ name: oven-exporter
 title: Oven Exporer
 # use from git tag
 version:
-  v(?<version>+({0..9}).+({0..9})).*: $<version>
+  v(?<version>+({0..9}).+({0..9}).+({0..9})): $<version>
   main: latest
 
 nav:
