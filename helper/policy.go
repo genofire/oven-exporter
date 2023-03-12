@@ -9,9 +9,9 @@ import (
 )
 
 type Policy struct {
-	URLExpire    int    `json:"url_expire"`
-	URLActivate  int    `json:"url_activate,omitempty"`
-	StreamExpire int    `json:"stream_expire,omitempty"`
+	URLExpire    int64  `json:"url_expire"`
+	URLActivate  int64  `json:"url_activate,omitempty"`
+	StreamExpire int64  `json:"stream_expire,omitempty"`
 	AllowIP      string `json:"allow_ip,omitempty"`
 }
 
