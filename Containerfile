@@ -1,7 +1,7 @@
 ##
 # Compile application
 ##
-FROM golang:alpine AS build-env
+FROM docker.io/library/golang:alpine AS build-env
 WORKDIR /app
 COPY . .
 # ge dependencies

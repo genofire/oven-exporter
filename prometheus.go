@@ -1,7 +1,7 @@
 package main
 
 import (
-	"dev.sum7.eu/genofire/oven-exporter/api"
+	"codeberg.org/Mediathek/oven-exporter/api"
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 )

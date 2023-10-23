@@ -14,7 +14,7 @@ This Exporter use the REST-API of OvenMediaEngine, to setting it up, that a look
 
 Install https://golang.org/doc/install[golang].
 
-Run: `go install -v dev.sum7.eu/genofire/oven-exporter@latest`
+Run: `go install -v codeberg.org/Mediathek/oven-exporter@latest`
 
 ==== Configuration
 

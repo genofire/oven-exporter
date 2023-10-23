@@ -16,7 +16,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 
-	"dev.sum7.eu/genofire/oven-exporter/api"
+	"codeberg.org/Mediathek/oven-exporter/api"
 )
 
 var configExtParser = map[string]koanf.Parser{
